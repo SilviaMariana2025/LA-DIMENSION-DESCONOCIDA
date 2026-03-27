@@ -1,0 +1,59 @@
+📘 Instrucciones de uso del proyecto
+
+Para utilizar correctamente la aplicación, sigue estos pasos:
+
+🔹 1. Abrir el proyecto
+Descarga y descomprime la carpeta del proyecto.
+Abre la carpeta y busca el archivo index.html.
+Haz doble clic o ábrelo con un navegador como:
+Google Chrome
+Microsoft Edge
+Mozilla Firefox
+
+👉 También puedes usar Live Server en Visual Studio Code para un mejor funcionamiento.
+
+🔹 2. Inicio de la aplicación
+
+Al abrir la página, se cargará automáticamente una serie principal:
+
+👉 The Twilight Zone
+
+Esto es solo un ejemplo para mostrar cómo funciona la app.
+
+🔹 3. ¿Cómo usar la aplicación?
+
+Dentro de la página puedes hacer lo siguiente:
+
+🔍 Buscar series
+Escribe el nombre de una serie en el buscador.
+📄 Ver información
+Puedes ver detalles como descripción y datos de la serie.
+🎭 Ver actores
+Consulta qué actores participan.
+🔁 Ver series similares
+La app te recomienda otras series parecidas.
+🎬 Explorar por género
+Puedes descubrir series según categorías.
+🔹 4. Conexión a internet
+
+La aplicación funciona con datos en tiempo real desde:
+
+👉 The Movie Database (TMDB)
+
+Por eso:
+
+✔ Necesitas internet
+✔ La información puede cambiar
+
+🔹 5. Instalación (opcional)
+
+Si usas un navegador como Chrome:
+
+👉 Puedes instalar la app (como si fuera una aplicación en tu dispositivo)
+
+🧠 Resumen
+Abres el archivo index.html
+Usas el buscador o exploras
+Ves información de series
+
+👉 ¡Y listo! Puedes navegar fácilmente por el contenido 🎬✨
