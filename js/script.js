@@ -20,6 +20,7 @@ return `<div class="icono-volver" onclick="verDetalles(${seriePrincipal})">↩</
 
 // función que permite buscar series escribiendo un nombre en el input
 async function buscarSerie() {
+if (!verificarConexion("buscar una serie")) return;
 
 // obtiene el texto que escribió el usuario
 const query = document.getElementById("searchInput").value;
@@ -188,6 +189,7 @@ allowfullscreen>
 
 // función que obtiene los actores de la serie
 async function verActores(id){
+if (!verificarConexion("ver los actores")) return;
 
 mostrarLoading();
 
@@ -278,6 +280,7 @@ ${botonVolver()}
 
 }
 async function verDondeVer(id){
+if (!verificarConexion("ver dónde verla")) return;
 
 mostrarLoading();
 
@@ -368,6 +371,7 @@ container.appendChild(div);
 
 // función que obtiene series similares a la principal
 async function verSimilares(id){
+if (!verificarConexion("ver series similares")) return;
 
 mostrarLoading();
 
@@ -426,6 +430,7 @@ console.error("Error:", error);
 }
 // función que permite descubrir series por género
 async function verPorGenero(idGenero){
+if (!verificarConexion("descubrir por género")) return;
 
 mostrarLoading();
 
@@ -448,6 +453,7 @@ console.error("Error:", error);
 
 }
 async function verDetallesTemporada(idSerie, temporada){
+if (!verificarConexion("ver los detalles de la temporada")) return;
 
 mostrarLoading();
 
@@ -508,6 +514,7 @@ console.error(error);
 }
 
 async function verTemporadas(idSerie){
+if (!verificarConexion("ver las temporadas")) return;
 
 mostrarLoading();
 
@@ -566,6 +573,7 @@ grid.appendChild(div);
 
 }
 async function verTrailer(id){
+if (!verificarConexion("ver trailers")) return;
 
 mostrarLoading();
 
@@ -633,6 +641,7 @@ console.error(error);
 }
 }
 async function verReviews(id){
+if (!verificarConexion("ver los comentarios")) return;
 
 mostrarLoading();
 
@@ -782,6 +791,33 @@ Eventos sobrenaturales y mundos imaginarios que desafían la lógica.
 }
 
 
+function verificarConexion(accion) {
+  if (!navigator.onLine) {
+    const container = document.getElementById("results");
+    container.innerHTML = `
+      ${botonVolver()}
+      <div style="text-align: center; margin-top: 50px;">
+        <h2>⚠️ Sin Conexión</h2>
+        <p>Para ${accion}, necesitas conexión a internet.</p>
+      </div>
+    `;
+    return false;
+  }
+  return true;
+}
+
+window.addEventListener("offline", () => {
+    alert("Te encuentras sin conexión a internet. Algunas funciones no estarán disponibles.");
+});
+
+window.addEventListener("online", () => {
+    alert("Conexión a internet restablecida.");
+    const container = document.getElementById("results");
+    if (container.innerHTML.includes("Sin Conexión")) {
+        verDetalles(seriePrincipal);
+    }
+});
+
 // inicia la aplicación mostrando la tarjeta principal de the twilight zone
 verDetalles(seriePrincipal);
 
@@ -789,7 +825,4 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js")
     .then(() => console.log("Service Worker registrado"))
     .catch(error => console.log("Error:", error));
-}
-if (!navigator.onLine) {
-  alert("Estás sin internet. Algunas funciones no estarán disponibles.");
 }
