@@ -105,36 +105,33 @@ container.appendChild(div);
 // función que muestra los detalles de una serie específica
 async function verDetalles(id){
 
-// solo permite entrar a la serie principal del proyecto
-if(id !== seriePrincipal){
-document.getElementById("results").innerHTML =
-"<h2>⚠️ Solo puedes entrar a The Twilight Zone</h2>" + botonVolver();
-return;
-}
+  mostrarLoading();
 
-// muestra mensaje de carga
-mostrarLoading();
+  if (!navigator.onLine) {
+    const dataGuardada = localStorage.getItem("detalleSerie");
 
-// url para obtener detalles de la serie
-const url = `${baseUrl}/tv/${id}?api_key=${apiKey}&language=es-ES`;
+    if (dataGuardada) {
+      mostrarDetalles(JSON.parse(dataGuardada));
+    } else {
+      document.getElementById("results").innerHTML =
+        "<h2>📡 Sin conexión y sin datos</h2>" + botonVolver();
+    }
+    return;
+  }
 
-try{
+  const url = `${baseUrl}/tv/${id}?api_key=${apiKey}&language=es-ES`;
 
-// realiza la petición a la api
-const response = await fetch(url);
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
-// convierte la respuesta en json
-const data = await response.json();
+    localStorage.setItem("detalleSerie", JSON.stringify(data));
 
-// envía los datos para mostrarlos
-mostrarDetalles(data);
+    mostrarDetalles(data);
 
-}catch(error){
-
-console.error("Error:", error);
-
-}
-
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function mostrarDetalles(serie){
@@ -356,6 +353,8 @@ console.error(error);
 }
 async function precargarDatos() {
 
+  if (!navigator.onLine) return; // 🔴 no intentar si no hay internet
+
   try {
 
     // 🔥 DETALLES
@@ -378,12 +377,11 @@ async function precargarDatos() {
     data = await res.json();
     localStorage.setItem("temporadas", JSON.stringify(data.seasons));
 
-    console.log("✅ Datos precargados correctamente");
+    console.log("✅ Datos guardados correctamente");
 
   } catch (error) {
-    console.log("⚠️ No se pudieron precargar datos");
+    console.log("⚠️ Error al precargar");
   }
-
 }
 function mostrarActores(actores){
 
@@ -420,60 +418,34 @@ container.appendChild(div);
 // función que obtiene series similares a la principal
 async function verSimilares(id){
 
-mostrarLoading();
+  mostrarLoading();
 
-// url para obtener series similares
-const url = `${baseUrl}/tv/${id}/similar?api_key=${apiKey}&language=es-ES`;
+  if (!navigator.onLine) {
 
-try{
+    const dataGuardada = localStorage.getItem("similares");
 
-const response = await fetch(url);
-const data = await response.json();
+    if (dataGuardada) {
+      mostrarResultados(JSON.parse(dataGuardada));
+    } else {
+      document.getElementById("results").innerHTML =
+        "<h2>📡 Sin conexión</h2>" + botonVolver();
+    }
+    return;
+  }
 
-const container = document.getElementById("results");
+  const url = `${baseUrl}/tv/${id}/similar?api_key=${apiKey}&language=es-ES`;
 
-container.classList.remove("principal");
-container.classList.add("grid");
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
+    localStorage.setItem("similares", JSON.stringify(data.results));
 
-container.innerHTML = `
-${botonVolver()}
-<h1 class="titulo-similares">🌌 SERIES SIMILARES A THE TWILIGHT ZONE 🌌</h1>
-<p class="descripcion-similares">
-Descubre otras series de ciencia ficción, misterio y fenómenos inexplicables 👁️✨
-</p>
-`;
+    mostrarResultados(data.results);
 
-// recorrer series
-data.results.forEach(serie => {
-
-const poster = serie.poster_path
-? `https://image.tmdb.org/t/p/w200${serie.poster_path}`
-: "https://via.placeholder.com/200x300?text=Sin+Imagen";
-
-const descripcionCorta = serie.overview
-? serie.overview.substring(0,120) + "..."
-: "Sin descripción disponible";
-
-const div = document.createElement("div");
-
-div.innerHTML = `
-<div class="card" onclick="verDetalles(${serie.id})">
-<img src="${poster}">
-<h3>${serie.name}</h3>
-<p>${descripcionCorta}</p>
-<button>Ver más</button>
-</div>
-`;
-
-container.appendChild(div);
-
-});
-
-}catch(error){
-console.error("Error:", error);
-}
-
+  } catch (error) {
+    console.error(error);
+  }
 }
 // función que permite descubrir series por género
 async function verPorGenero(idGenero){
@@ -564,21 +536,34 @@ console.error(error);
 
 async function verTemporadas(idSerie){
 
-mostrarLoading();
+  mostrarLoading();
 
-const url = `${baseUrl}/tv/${idSerie}?api_key=${apiKey}&language=es-ES`;
+  if (!navigator.onLine) {
 
-try{
+    const dataGuardada = localStorage.getItem("temporadas");
 
-const response = await fetch(url);
-const data = await response.json();
+    if (dataGuardada) {
+      mostrarTemporadas(JSON.parse(dataGuardada));
+    } else {
+      document.getElementById("results").innerHTML =
+        "<h2>📡 Sin conexión</h2>" + botonVolver();
+    }
+    return;
+  }
 
-mostrarTemporadas(data.seasons);
+  const url = `${baseUrl}/tv/${idSerie}?api_key=${apiKey}&language=es-ES`;
 
-}catch(error){
-console.error(error);
-}
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
 
+    localStorage.setItem("temporadas", JSON.stringify(data.seasons));
+
+    mostrarTemporadas(data.seasons);
+
+  } catch (error) {
+    console.error(error);
+  }
 }
 function mostrarTemporadas(temporadas){
 
