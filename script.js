@@ -40,14 +40,16 @@ const data = await response.json();
 
 // envía los resultados para mostrarlos en pantalla
 mostrarResultados(data.results);
-
-} catch (error) {
-
-// muestra error en consola si la petición falla
-console.error("Error:", error);
-
 }
+catch (error){
+  const container = document.getElementById("results");
 
+  container.innerHTML = `
+    <h2>📡 Estás sin conexión</h2>
+    <p>Solo puedes ver contenido cargado previamente.</p>
+    ${botonVolver()}
+  `;
+}
 }
 
 // función que muestra las series encontradas en forma de tarjetas
@@ -74,7 +76,7 @@ series.forEach(serie => {
 // obtiene el poster de la serie si existe
 const poster = serie.poster_path 
 ? `https://image.tmdb.org/t/p/w200${serie.poster_path}`
-: "";
+: "https://via.placeholder.com/200x300?text=Sin+Imagen";
 
 // crea una descripción corta de la serie
 const descripcionCorta = serie.overview
@@ -172,8 +174,10 @@ src="https://s3.amazonaws.com/arc-wordpress-client-uploads/infobae-wp/wp-content
 
 </div>
 
+
+${navigator.onLine ? `
 <h2 class="titulo-video">
-⚡ ENTRA SI TE ATREVES A LA DIMENSIÓN DESCONOCIDA ⚡
+⚡ ENTRA SI TE ATREVES ⚡
 </h2>
 <iframe 
 class="trailer"
@@ -181,6 +185,9 @@ src="https://www.youtube.com/embed/e5zg_zGhp7A"
 frameborder="0"
 allowfullscreen>
 </iframe>
+` : `
+<h2>🚫 Sin conexión - Trailer no disponible</h2>
+`}
 
 `;
 
@@ -398,7 +405,7 @@ data.results.forEach(serie => {
 
 const poster = serie.poster_path
 ? `https://image.tmdb.org/t/p/w200${serie.poster_path}`
-: "";
+: "https://via.placeholder.com/200x300?text=Sin+Imagen";
 
 const descripcionCorta = serie.overview
 ? serie.overview.substring(0,120) + "..."
@@ -462,7 +469,7 @@ const container = document.getElementById("results");
 
 const imagen = data.poster_path
 ? `https://image.tmdb.org/t/p/w400${data.poster_path}`
-: "";
+: "https://via.placeholder.com/200x300?text=Sin+Imagen";
 
 
 container.innerHTML = `
@@ -572,7 +579,16 @@ grid.appendChild(div);
 async function verTrailer(id){
 
 mostrarLoading();
+if (!navigator.onLine) {
+  const container = document.getElementById("results");
 
+  container.innerHTML = `
+    ${botonVolver()}
+    <h2>🚫 Sin conexión</h2>
+    <p>Los trailers no están disponibles sin internet.</p>
+  `;
+  return;
+}
 const url = `${baseUrl}/tv/${id}/videos?api_key=${apiKey}`;
 
 try{
@@ -786,7 +802,17 @@ Eventos sobrenaturales y mundos imaginarios que desafían la lógica.
 }
 
 
+function updateOnlineStatus() {
+  const banner = document.getElementById("offline-banner");
 
+  if (navigator.onLine) {
+    document.body.classList.remove("offline");
+    banner.style.display = "none";
+  } else {
+    document.body.classList.add("offline");
+    banner.style.display = "block";
+  }
+}
 
 // inicia la aplicación mostrando la tarjeta principal de the twilight zone
 verDetalles(seriePrincipal);

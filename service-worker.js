@@ -18,6 +18,7 @@ const urlsToCache = [
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
 ];
 
+// INSTALAR
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
@@ -25,47 +26,70 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
+// ACTIVAR
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keyList => {
-      return Promise.all(keyList.map(key => {
-        if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-          return caches.delete(key);
-        }
-      }));
+      return Promise.all(
+        keyList.map(key => {
+          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
     })
   );
   self.clients.claim();
 });
 
+// FETCH
 self.addEventListener("fetch", event => {
-  // 1. Excluir específicamente los videos (youtube) para que fallen en offline sin chocar con la app
-  if (event.request.url.includes("youtube.com") || event.request.url.includes("youtu.be")) {
-    event.respondWith(fetch(event.request)); // Solo usa la red
-    return;
-  }
 
-  // 2. Caché dinámico para imágenes (TMDB, pósters, fotos de actores) - Caché primero
-  if (event.request.destination === 'image' || event.request.url.includes("image.tmdb.org")) {
+  // 1. ❌ BLOQUEAR VIDEOS (YouTube) sin romper la app
+  if (
+    event.request.url.includes("youtube.com") ||
+    event.request.url.includes("youtu.be")
+  ) {
     event.respondWith(
-      caches.match(event.request).then(response => {
-        return response || fetch(event.request).then(fetchRes => {
-          return caches.open(DATA_CACHE_NAME).then(cache => {
-            cache.put(event.request.url, fetchRes.clone());
-            return fetchRes;
-          });
-        });
+      fetch(event.request).catch(() => {
+        return new Response("", { status: 204 });
       })
     );
     return;
   }
 
-  // 3. Peticiones de datos (API TMDB) - Red principal (Network First) con respaldo de caché
+  // 2. 🖼️ IMÁGENES (Cache First + fallback)
+  if (
+    event.request.destination === "image" ||
+    event.request.url.includes("image.tmdb.org")
+  ) {
+    event.respondWith(
+      caches.match(event.request).then(response => {
+        return (
+          response ||
+          fetch(event.request)
+            .then(fetchRes => {
+              return caches.open(DATA_CACHE_NAME).then(cache => {
+                cache.put(event.request.url, fetchRes.clone());
+                return fetchRes;
+              });
+            })
+            .catch(() => {
+              return caches.match(
+                "https://cdn-icons-png.flaticon.com/512/732/732228.png"
+              );
+            })
+        );
+      })
+    );
+    return;
+  }
+
+  // 3. 📡 API TMDB (Network First)
   if (event.request.url.includes("api.themoviedb.org")) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Si conseguimos la info, guardamos una copia y la mandamos
           if (response.status === 200) {
             const responseClone = response.clone();
             caches.open(DATA_CACHE_NAME).then(cache => {
@@ -75,24 +99,26 @@ self.addEventListener("fetch", event => {
           return response;
         })
         .catch(() => {
-          // Si falla internet, devolvemos los datos que tengamos cacheados
           return caches.match(event.request);
         })
     );
     return;
   }
 
-  // 4. Estrategia por defecto para lo principal (Cache first, fall back to network)
+  // 4. 📦 CACHE GENERAL (Cache First)
   event.respondWith(
     caches.match(event.request).then(response => {
-      return response || fetch(event.request).then(fetchRes => {
-        return caches.open(CACHE_NAME).then(cache => {
-          if (event.request.method === "GET") {
-             cache.put(event.request.url, fetchRes.clone());
-          }
-          return fetchRes;
-        });
-      });
+      return (
+        response ||
+        fetch(event.request).then(fetchRes => {
+          return caches.open(CACHE_NAME).then(cache => {
+            if (event.request.method === "GET") {
+              cache.put(event.request.url, fetchRes.clone());
+            }
+            return fetchRes;
+          });
+        })
+      );
     })
   );
 });
