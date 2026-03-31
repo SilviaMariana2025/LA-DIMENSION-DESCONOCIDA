@@ -1,0 +1,18 @@
+Instrucciones de ejecución
+
+Para ejecutar correctamente el proyecto se deben seguir los siguientes pasos:
+1. Descargar o descomprimir la carpeta del proyecto.
+2. Abrir la carpeta donde se encuentran los archivos del sistema.
+3. Localizar el archivo index.html.
+4. brir el archivo con cualquier navegador web moderno como:
+Google Chrome
+Microsoft Edge
+Mozilla Firefox
+5. Al abrir el archivo, el sistema cargará automáticamente la serie principal The Twilight Zone.
+6. Desde la interfaz el usuario puede:
+Buscar series utilizando el buscador.
+Ver información detallada de la serie.
+Consultar los actores que participan
+Ver series similares.
+Explorar otras series por género.
+La aplicación obtiene todos los datos en tiempo real desde la API de TMDB.

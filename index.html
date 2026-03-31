@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<!-- define que el documento usa html5 -->
+<html lang="es">
+<!-- indica que el idioma principal de la página es español -->
+
+<head>
+<meta charset="UTF-8">
+<!-- permite usar caracteres especiales como tildes y ñ -->
+
+
+<link rel="stylesheet" href="style.css">
+<!-- conecta el archivo css donde están todos los estilos de la página -->
+<link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+
+<div id="offline-banner" class="offline-banner">
+  ⚠️ Estás navegando sin conexión. Los videos no estarán disponibles. ⚠️
+</div>
+
+<!-- contenedor donde se mostrarán los resultados obtenidos desde la api -->
+<!-- aquí se insertan dinámicamente las tarjetas de series, actores o detalles -->
+<div id="results" class="grid"></div>
+
+<!-- conecta el archivo javascript que contiene toda la lógica del proyecto -->
+<script src="script.js"></script>
+
+</body>
+</html>
