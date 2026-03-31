@@ -208,12 +208,17 @@ const data = await response.json();
 
 console.log(data.cast);
 
+localStorage.setItem("actores", JSON.stringify(data.cast));
 mostrarActores(data.cast);
-
 }catch(error){
+  const dataGuardada = localStorage.getItem("actores");
 
-console.error("Error:", error);
-
+  if (dataGuardada) {
+    mostrarActores(JSON.parse(dataGuardada));
+  } else {
+    document.getElementById("results").innerHTML =
+      "<h2>📡 Sin conexión y sin datos guardados</h2>" + botonVolver();
+  }
 }
 
 }
@@ -340,7 +345,37 @@ console.error(error);
 }
 
 }
+async function precargarDatos() {
 
+  try {
+
+    // 🔥 DETALLES
+    let res = await fetch(`${baseUrl}/tv/${seriePrincipal}?api_key=${apiKey}&language=es-ES`);
+    let data = await res.json();
+    localStorage.setItem("detalleSerie", JSON.stringify(data));
+
+    // 🔥 ACTORES
+    res = await fetch(`${baseUrl}/tv/${seriePrincipal}/aggregate_credits?api_key=${apiKey}&language=es-ES`);
+    data = await res.json();
+    localStorage.setItem("actores", JSON.stringify(data.cast));
+
+    // 🔥 SIMILARES
+    res = await fetch(`${baseUrl}/tv/${seriePrincipal}/similar?api_key=${apiKey}&language=es-ES`);
+    data = await res.json();
+    localStorage.setItem("similares", JSON.stringify(data.results));
+
+    // 🔥 TEMPORADAS
+    res = await fetch(`${baseUrl}/tv/${seriePrincipal}?api_key=${apiKey}&language=es-ES`);
+    data = await res.json();
+    localStorage.setItem("temporadas", JSON.stringify(data.seasons));
+
+    console.log("✅ Datos precargados correctamente");
+
+  } catch (error) {
+    console.log("⚠️ No se pudieron precargar datos");
+  }
+
+}
 function mostrarActores(actores){
 
 const container = document.getElementById("results");
@@ -816,6 +851,7 @@ function updateOnlineStatus() {
 
 // inicia la aplicación mostrando la tarjeta principal de the twilight zone
 verDetalles(seriePrincipal);
+precargarDatos();
 
 // Manejo del estado offline
 function updateOnlineStatus() {
