@@ -199,3 +199,6 @@ window.addEventListener("offline", updateOnlineStatus);
 // 🚀 INICIO
 verDetalles(seriePrincipal);
 updateOnlineStatus();
+if (location.hostname === "localhost") {
+  navigator.serviceWorker.register("service-worker.js");
+}
