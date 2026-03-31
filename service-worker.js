@@ -1,5 +1,5 @@
 const CACHE_NAME = "series-app-v2";
-const DATA_CACHE_NAME = "series-data-v1";
+const DATA_CACHE_NAME = "series-data-v2";
 
 const urlsToCache = [
   "./",
