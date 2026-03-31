@@ -198,19 +198,9 @@ async function verActores(id){
 
 mostrarLoading();
 
-// url para obtener el reparto de la serie
-const url = `${baseUrl}/tv/${id}/aggregate_credits?api_key=${apiKey}&language=es-ES`;
+// 🔴 SI NO HAY INTERNET → usar localStorage directo
+if (!navigator.onLine) {
 
-try{
-
-const response = await fetch(url);
-const data = await response.json();
-
-console.log(data.cast);
-
-localStorage.setItem("actores", JSON.stringify(data.cast));
-mostrarActores(data.cast);
-}catch(error){
   const dataGuardada = localStorage.getItem("actores");
 
   if (dataGuardada) {
@@ -219,8 +209,27 @@ mostrarActores(data.cast);
     document.getElementById("results").innerHTML =
       "<h2>📡 Sin conexión y sin datos guardados</h2>" + botonVolver();
   }
+
+  return;
 }
 
+const url = `${baseUrl}/tv/${id}/aggregate_credits?api_key=${apiKey}&language=es-ES`;
+
+try{
+
+const response = await fetch(url);
+const data = await response.json();
+
+// guardar
+localStorage.setItem("actores", JSON.stringify(data.cast));
+
+mostrarActores(data.cast);
+
+}catch(error){
+
+console.error(error);
+
+}
 }
 function mostrarRating(rating){
 

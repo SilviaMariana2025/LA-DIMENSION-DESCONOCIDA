@@ -86,24 +86,37 @@ self.addEventListener("fetch", event => {
   }
 
   // 3. 📡 API TMDB (Network First)
-  if (event.request.url.includes("api.themoviedb.org")) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          if (response.status === 200) {
-            const responseClone = response.clone();
-            caches.open(DATA_CACHE_NAME).then(cache => {
-              cache.put(event.request.url, responseClone);
-            });
-          }
-          return response;
-        })
-        .catch(() => {
-          return caches.match(event.request);
-        })
-    );
-    return;
-  }
+ if (event.request.url.includes("api.themoviedb.org")) {
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(DATA_CACHE_NAME).then(cache => {
+            cache.put(event.request.url, responseClone);
+          });
+        }
+        return response;
+      })
+      .catch(async () => {
+
+        const cache = await caches.open(DATA_CACHE_NAME);
+        const cachedResponses = await cache.matchAll();
+
+        // 🔥 devolver la primera respuesta guardada (fallback real)
+        if (cachedResponses.length > 0) {
+          return cachedResponses[0];
+        }
+
+        // ⚠️ respuesta vacía para que no rompa la app
+        return new Response(JSON.stringify({ results: [] }), {
+          headers: { "Content-Type": "application/json" }
+        });
+
+      })
+  );
+  return;
+}
 
   // 4. 📦 CACHE GENERAL (Cache First)
   event.respondWith(
